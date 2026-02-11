@@ -977,11 +977,13 @@
     </p>
 
     <div id="formContainer">
-      <div class="email-form" id="signupForm">
-        <input type="text" id="firstName" placeholder="First name" required autocomplete="given-name">
-        <input type="email" id="emailInput" placeholder="you@email.com" required autocomplete="email">
-        <button type="button" id="submitBtn" onclick="handleSubmit()">Get free access</button>
-      </div>
+      <form class="email-form" id="signupForm" name="beta-signup" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+        <input type="hidden" name="form-name" value="beta-signup">
+        <input type="hidden" name="bot-field">
+        <input type="text" id="firstName" name="name" placeholder="First name" required autocomplete="given-name">
+        <input type="email" id="emailInput" name="email" placeholder="you@email.com" required autocomplete="email">
+        <button type="submit" id="submitBtn">Get free access</button>
+      </form>
       <p class="form-note">No spam. No selling your info. Just plugin updates and the occasional production tip.</p>
     </div>
 
@@ -1192,7 +1194,10 @@ const observer = new IntersectionObserver((entries) => {
 reveals.forEach(el => observer.observe(el));
 
 // ── FORM HANDLER ──
-function handleSubmit() {
+const form = document.getElementById('signupForm');
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+
   const name = document.getElementById('firstName').value.trim();
   const email = document.getElementById('emailInput').value.trim();
   const btn = document.getElementById('submitBtn');
@@ -1207,11 +1212,16 @@ function handleSubmit() {
   btn.disabled = true;
   btn.textContent = 'Joining...';
 
-  // Simulate API call — replace with your actual endpoint
-  setTimeout(() => {
+  // Submit to Netlify Forms
+  const formData = new FormData(form);
+  fetch('/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams(formData).toString()
+  })
+  .then(() => {
     document.getElementById('formContainer').style.display = 'none';
     document.getElementById('successMsg').classList.add('show');
-    console.log('Signup:', { name, email });
 
     // Trigger PKG download
     const link = document.createElement('a');
@@ -1220,12 +1230,13 @@ function handleSubmit() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  }, 1000);
-}
-
-// Enter key submits
-document.getElementById('emailInput').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') handleSubmit();
+  })
+  .catch((err) => {
+    console.error('Form error:', err);
+    btn.textContent = 'Something went wrong';
+    btn.style.background = 'var(--coral)';
+    setTimeout(() => { btn.textContent = 'Get free access'; btn.style.background = ''; btn.disabled = false; }, 2000);
+  });
 });
 </script>
 
