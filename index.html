@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HarmoniQ — Intelligent Harshness Reduction</title>
+<meta name="description" content="Your mixes sound harsh. HarmoniQ fixes that automatically. Free beta — join the list.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #040810;
+    --bg-surface: #060a14;
+    --bg-card: #0a1020;
+    --bg-elevated: #0e1630;
+    --border: #152035;
+    --border-hover: #1e3050;
+    --text-primary: #e8ecf4;
+    --text-secondary: #8a9ab8;
+    --text-muted: #4a5a7a;
+    --teal: #40c8b0;
+    --teal-glow: #5eecd0;
+    --amber: #d29922;
+    --coral: #e85050;
+    --blue: #60b0e0;
+    --teal-bg: rgba(64, 200, 176, 0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── AMBIENT GLOW ── */
+  .ambient-glow {
+    position: fixed;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.07;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-teal { background: var(--teal); top: -200px; left: -100px; }
+  .glow-amber { background: var(--amber); bottom: -200px; right: -100px; }
+
+  /* ── CONTAINER ── */
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── NAV ── */
+  nav {
+    padding: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: 0.15em;
+    color: var(--text-primary);
+  }
+  .logo span { color: var(--teal); }
+  .nav-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 80px 0 40px;
+    text-align: center;
+    position: relative;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--teal-bg);
+    border: 1px solid rgba(64, 200, 176, 0.15);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--teal);
+    letter-spacing: 0.08em;
+    margin-bottom: 28px;
+    animation: fadeUp 0.8s ease both;
+  }
+  .hero-badge .dot {
+    width: 6px; height: 6px;
+    background: var(--teal);
+    border-radius: 50%;
+    animation: pulse 2s ease infinite;
+  }
+  .hero h1 {
+    font-size: clamp(38px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+    animation: fadeUp 0.8s ease 0.1s both;
+  }
+  .hero h1 .harsh {
+    color: var(--coral);
+    position: relative;
+    display: inline-block;
+  }
+  .hero h1 .harsh::after {
+    content: '';
+    position: absolute;
+    left: -2px; right: -2px;
+    bottom: 8px;
+    height: 3px;
+    background: var(--coral);
+    opacity: 0.4;
+    border-radius: 2px;
+  }
+  .hero h1 .smooth {
+    background: linear-gradient(135deg, var(--teal), var(--teal-glow));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: clamp(16px, 2.5vw, 20px);
+    font-weight: 300;
+    color: var(--text-secondary);
+    max-width: 580px;
+    margin: 0 auto 36px;
+    line-height: 1.6;
+    animation: fadeUp 0.8s ease 0.2s both;
+  }
+  .hero-cta-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    animation: fadeUp 0.8s ease 0.3s both;
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--teal);
+    color: var(--bg-deep);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 14px 32px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+  }
+  .btn-primary:hover {
+    background: var(--teal-glow);
+    box-shadow: 0 0 24px rgba(64, 200, 176, 0.25);
+    transform: translateY(-1px);
+  }
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 14px 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  .btn-secondary:hover {
+    border-color: var(--border-hover);
+    color: var(--text-primary);
+  }
+
+  /* ── PLUGIN MOCKUP ── */
+  .plugin-section {
+    padding: 40px 0 60px;
+    animation: fadeUp 0.8s ease 0.4s both;
+  }
+  .plugin-window {
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow:
+      0 4px 6px rgba(0,0,0,0.3),
+      0 20px 60px rgba(0,0,0,0.5),
+      0 0 0 1px rgba(64, 200, 176, 0.03);
+    position: relative;
+  }
+  .plugin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: #080c18;
+    border-bottom: 1px solid var(--border);
+  }
+  .plugin-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+  }
+  .plugin-version {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-left: 8px;
+  }
+  .profile-pills {
+    display: flex;
+    gap: 3px;
+  }
+  .profile-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    background: transparent;
+    letter-spacing: 0.04em;
+  }
+  .profile-pill.active {
+    background: var(--teal);
+    color: var(--bg-deep);
+    border-color: var(--teal);
+    font-weight: 600;
+  }
+  .adaptive-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--bg-deep);
+    background: var(--teal);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+  .spectrum-area {
+    position: relative;
+    height: 280px;
+    margin: 10px 12px;
+    overflow: hidden;
+  }
+  #spectrumCanvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+  }
+  .controls-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 36px;
+    padding: 14px 16px 10px;
+    border-top: 1px solid rgba(21, 32, 53, 0.6);
+  }
+  .knob-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .knob-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+  .knob-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .knob-divider {
+    width: 1px;
+    height: 50px;
+    background: var(--border);
+  }
+  .plugin-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+  }
+  .mode-pills { display: flex; gap: 6px; }
+  .mode-pill {
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    letter-spacing: 0.08em;
+  }
+  .mode-pill.active-amber {
+    color: var(--amber);
+    border-color: var(--amber);
+    background: rgba(210, 153, 34, 0.08);
+  }
+
+  /* ── SIGNAL FLOW ── */
+  .flow-section {
+    padding: 60px 0;
+  }
+  .flow-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--teal);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .flow-heading {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .flow-sub {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 16px;
+    font-weight: 300;
+    max-width: 560px;
+    margin: 0 auto 48px;
+    line-height: 1.6;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+  .step {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px 24px;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  .step:hover {
+    border-color: var(--border-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--teal);
+    letter-spacing: 0.1em;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .step-num::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .step h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+  .step p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+  .step .step-accent {
+    position: absolute;
+    top: 0;
+    left: 24px;
+    right: 24px;
+    height: 2px;
+    border-radius: 0 0 2px 2px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .step:hover .step-accent { opacity: 1; }
+  .step:nth-child(1) .step-accent { background: var(--teal); }
+  .step:nth-child(2) .step-accent { background: var(--coral); }
+  .step:nth-child(3) .step-accent { background: var(--teal-glow); }
+
+  /* ── PROBLEM/SOLUTION ── */
+  .problem-section {
+    padding: 60px 0;
+    border-top: 1px solid var(--border);
+  }
+  .comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .comp-card {
+    border-radius: 8px;
+    padding: 32px 28px;
+    border: 1px solid;
+  }
+  .comp-card.without {
+    background: rgba(232, 80, 80, 0.03);
+    border-color: rgba(232, 80, 80, 0.15);
+  }
+  .comp-card.with {
+    background: var(--teal-bg);
+    border-color: rgba(64, 200, 176, 0.15);
+  }
+  .comp-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .comp-card.without .comp-tag { color: var(--coral); }
+  .comp-card.with .comp-tag { color: var(--teal); }
+  .comp-tag .icon { font-size: 14px; }
+  .comp-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .comp-list li {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    padding-left: 20px;
+    position: relative;
+    font-weight: 300;
+  }
+  .comp-card.without .comp-list li::before {
+    content: '×';
+    position: absolute;
+    left: 0;
+    color: var(--coral);
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.3;
+  }
+  .comp-card.with .comp-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--teal);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  /* ── PROFILES SHOWCASE ── */
+  .profiles-section {
+    padding: 60px 0;
+    border-top: 1px solid var(--border);
+  }
+  .profile-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .profile-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+  .profile-card:hover {
+    border-color: var(--teal);
+    background: var(--teal-bg);
+  }
+  .profile-card .profile-icon {
+    font-size: 22px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .profile-card .profile-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+  .profile-card .profile-range {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+  }
+
+  /* ── CTA / EMAIL CAPTURE ── */
+  .cta-section {
+    padding: 80px 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  .cta-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(232, 80, 80, 0.06);
+    border: 1px solid rgba(232, 80, 80, 0.15);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--coral);
+    letter-spacing: 0.08em;
+    margin-bottom: 24px;
+  }
+  .cta-heading {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .cta-sub {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    max-width: 520px;
+    margin: 0 auto 36px;
+    line-height: 1.6;
+  }
+  .email-form {
+    display: flex;
+    gap: 10px;
+    max-width: 480px;
+    margin: 0 auto 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .email-form input {
+    flex: 1;
+    min-width: 140px;
+    padding: 14px 18px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  .email-form input::placeholder {
+    color: var(--text-muted);
+  }
+  .email-form input:focus {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(64, 200, 176, 0.08);
+  }
+  .email-form button {
+    padding: 14px 28px;
+    background: var(--teal);
+    color: var(--bg-deep);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+  }
+  .email-form button:hover {
+    background: var(--teal-glow);
+    box-shadow: 0 0 20px rgba(64, 200, 176, 0.2);
+    transform: translateY(-1px);
+  }
+  .email-form button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .form-note {
+    font-size: 12px;
+    color: var(--text-muted);
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  .success-msg {
+    background: var(--teal-bg);
+    border: 1px solid rgba(64, 200, 176, 0.2);
+    border-radius: 8px;
+    padding: 20px 28px;
+    max-width: 480px;
+    margin: 0 auto;
+    display: none;
+  }
+  .success-msg.show { display: block; }
+  .success-msg h3 {
+    color: var(--teal);
+    font-size: 18px;
+    margin-bottom: 6px;
+  }
+  .success-msg p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 300;
+  }
+
+  /* ── SPECS BAR ── */
+  .specs-bar {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    padding: 24px 0;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .spec-item {
+    text-align: center;
+  }
+  .spec-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.05em;
+  }
+  .spec-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 28px 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  footer p {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  footer .footer-brand {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .steps { grid-template-columns: 1fr; }
+    .comparison { grid-template-columns: 1fr; }
+    .profile-grid { grid-template-columns: repeat(2, 1fr); }
+    .email-form { flex-direction: column; }
+    .email-form input { min-width: 100%; }
+    .specs-bar { gap: 20px; }
+    .hero { padding: 50px 0 30px; }
+    .controls-row { gap: 20px; flex-wrap: wrap; }
+    .plugin-header { flex-wrap: wrap; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ambient-glow glow-teal"></div>
+<div class="ambient-glow glow-amber"></div>
+
+<div class="container">
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">Harmoni<span>Q</span></div>
+    <div class="nav-tag">MycoStudio</div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      FREE BETA — LIMITED EARLY ACCESS
+    </div>
+    <h1>Your mix sounds <span class="harsh">harsh</span>.<br>Make it <span class="smooth">smooth</span>.</h1>
+    <p class="hero-sub">
+      HarmoniQ listens to your track and automatically removes harsh frequencies.
+      No hunting. No guessing. Select a profile, hit play, and hear the difference.
+    </p>
+    <div class="hero-cta-row">
+      <a href="#get-it" class="btn-primary">Get the free beta ↓</a>
+      <a href="#how-it-works" class="btn-secondary">See how it works</a>
+    </div>
+  </section>
+
+  <!-- PLUGIN MOCKUP -->
+  <section class="plugin-section">
+    <div class="plugin-window">
+      <div class="plugin-header">
+        <div style="display:flex;align-items:center;">
+          <span class="plugin-title">HarmoniQ</span>
+          <span class="plugin-version">v3.0</span>
+        </div>
+        <div class="profile-pills">
+          <span class="profile-pill active">Vocal</span>
+          <span class="profile-pill">Drums</span>
+          <span class="profile-pill">Bass</span>
+          <span class="profile-pill">E.Gtr</span>
+          <span class="profile-pill">Synth</span>
+          <span class="profile-pill">Mix</span>
+        </div>
+        <span class="adaptive-badge">ADAPTIVE</span>
+      </div>
+      <div class="spectrum-area">
+        <canvas id="spectrumCanvas"></canvas>
+      </div>
+      <div class="controls-row">
+        <div class="knob-group">
+          <svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="none" stroke="#152035" stroke-width="2.5" stroke-dasharray="3 2" stroke-linecap="round" transform="rotate(-135 24 24)"/><circle cx="24" cy="24" r="18" fill="none" stroke="#5a8aaa" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="47 100" transform="rotate(-135 24 24)"/><circle cx="24" cy="24" r="13" fill="#0e1630" stroke="#1a2540"/><line x1="24" y1="24" x2="24" y2="13" stroke="#5a8aaa" stroke-width="2" stroke-linecap="round" transform="rotate(0 24 24)"/></svg>
+          <span class="knob-value">50%</span>
+          <span class="knob-label">Sensitivity</span>
+        </div>
+        <div class="knob-group">
+          <svg width="52" height="52" viewBox="0 0 52 52"><circle cx="26" cy="26" r="20" fill="none" stroke="#152035" stroke-width="3" stroke-dasharray="3 2" stroke-linecap="round" transform="rotate(-135 26 26)"/><circle cx="26" cy="26" r="20" fill="none" stroke="#40c8b0" stroke-width="3" stroke-linecap="round" stroke-dasharray="63 100" transform="rotate(-135 26 26)" style="filter:drop-shadow(0 0 3px rgba(64,200,176,0.3))"/><circle cx="26" cy="26" r="15" fill="#0e1630" stroke="#1a2540"/><line x1="26" y1="26" x2="26" y2="14" stroke="#40c8b0" stroke-width="2" stroke-linecap="round" transform="rotate(68 26 26)"/></svg>
+          <span class="knob-value">65%</span>
+          <span class="knob-label">Depth</span>
+        </div>
+        <div class="knob-group">
+          <svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="none" stroke="#152035" stroke-width="2.5" stroke-dasharray="3 2" stroke-linecap="round" transform="rotate(-135 24 24)"/><circle cx="24" cy="24" r="18" fill="none" stroke="#d29922" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="40 100" transform="rotate(-135 24 24)"/><circle cx="24" cy="24" r="13" fill="#0e1630" stroke="#1a2540"/><line x1="24" y1="24" x2="24" y2="13" stroke="#d29922" stroke-width="2" stroke-linecap="round" transform="rotate(-27 24 24)"/></svg>
+          <span class="knob-value">3.5k Hz</span>
+          <span class="knob-label">Focus</span>
+        </div>
+        <div class="knob-divider"></div>
+        <div class="knob-group">
+          <svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="none" stroke="#152035" stroke-width="2.5" stroke-dasharray="3 2" stroke-linecap="round" transform="rotate(-135 24 24)"/><circle cx="24" cy="24" r="18" fill="none" stroke="#60b0e0" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="85 100" transform="rotate(-135 24 24)"/><circle cx="24" cy="24" r="13" fill="#0e1630" stroke="#1a2540"/><line x1="24" y1="24" x2="24" y2="13" stroke="#60b0e0" stroke-width="2" stroke-linecap="round" transform="rotate(120 24 24)"/></svg>
+          <span class="knob-value">100%</span>
+          <span class="knob-label">Mix</span>
+        </div>
+      </div>
+      <div class="plugin-bottom">
+        <div class="mode-pills">
+          <span class="mode-pill active-amber">LISTEN</span>
+          <span class="mode-pill">A/B</span>
+          <span class="mode-pill">LOCK</span>
+        </div>
+        <span style="letter-spacing:0.06em">▸ Advanced</span>
+        <div style="display:flex;gap:12px;">
+          <span>23ms</span>
+          <span>MycoStudio</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="flow-section reveal" id="how-it-works">
+    <div class="flow-label">How it works</div>
+    <h2 class="flow-heading">Three steps. Zero guesswork.</h2>
+    <p class="flow-sub">
+      HarmoniQ uses a perceptual model trained on how the human ear experiences harshness. It's not a static EQ. It learns your track.
+    </p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-accent"></div>
+        <div class="step-num">01</div>
+        <h3>Select a profile</h3>
+        <p>Vocal, Drums, Bass, Guitar, Synth, or Mix Bus. Each profile knows exactly where harshness lives for that instrument and sets the detection range automatically.</p>
+      </div>
+      <div class="step">
+        <div class="step-accent"></div>
+        <div class="step-num">02</div>
+        <h3>It learns your track</h3>
+        <p>Adaptive mode builds a spectral baseline of your audio in 2 seconds. From that point, it only acts on frequencies that spike above what's expected. The character stays. The problems go.</p>
+      </div>
+      <div class="step">
+        <div class="step-accent"></div>
+        <div class="step-num">03</div>
+        <h3>Watch it work</h3>
+        <p>Coral curtains descend on the spectrum to show exactly where and how much HarmoniQ is reducing. Turn up Depth to push harder. Hit LISTEN to hear only what's being removed.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON -->
+  <section class="problem-section reveal">
+    <div class="flow-label">The difference</div>
+    <h2 class="flow-heading">Stop chasing frequencies</h2>
+    <p class="flow-sub">
+      You've been there. Sweeping a parametric EQ at 2am trying to find "that frequency." There's a better way.
+    </p>
+    <div class="comparison">
+      <div class="comp-card without">
+        <div class="comp-tag"><span class="icon">✕</span> WITHOUT HARMONIQ</div>
+        <ul class="comp-list">
+          <li>Sweep EQ bands hunting for harsh frequencies</li>
+          <li>Apply static cuts that kill the life in your mix</li>
+          <li>Different problem on every track, starting over each time</li>
+          <li>Transients get destroyed by broadband processing</li>
+          <li>Hours spent on something you can't even fully hear</li>
+        </ul>
+      </div>
+      <div class="comp-card with">
+        <div class="comp-tag"><span class="icon">✓</span> WITH HARMONIQ</div>
+        <ul class="comp-list">
+          <li>Plugin detects harsh frequencies automatically</li>
+          <li>Dynamic nodes appear only when problems happen</li>
+          <li>Each profile adapts to what that instrument needs</li>
+          <li>Transients are preserved even during reduction</li>
+          <li>Insert it, select a profile, move on to the next track</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROFILES -->
+  <section class="profiles-section reveal">
+    <div class="flow-label">8 intelligent profiles</div>
+    <h2 class="flow-heading">One plugin for your entire session</h2>
+    <p class="flow-sub">
+      Each profile configures detection range, focus frequency, sensitivity, and dynamics for that specific instrument. No manual tuning required.
+    </p>
+    <div class="profile-grid">
+      <div class="profile-card">
+        <span class="profile-icon">🎤</span>
+        <div class="profile-name">Vocal</div>
+        <div class="profile-range">800 - 12k Hz</div>
+      </div>
+      <div class="profile-card">
+        <span class="profile-icon">🥁</span>
+        <div class="profile-name">Drums</div>
+        <div class="profile-range">300 - 8k Hz</div>
+      </div>
+      <div class="profile-card">
+        <span class="profile-icon">🎸</span>
+        <div class="profile-name">Bass</div>
+        <div class="profile-range">150 - 3k Hz</div>
+      </div>
+      <div class="profile-card">
+        <span class="profile-icon">⚡</span>
+        <div class="profile-name">E. Guitar</div>
+        <div class="profile-range">800 - 10k Hz</div>
+      </div>
+      <div class="profile-card">
+        <span class="profile-icon">🪕</span>
+        <div class="profile-name">A. Guitar</div>
+        <div class="profile-range">600 - 8k Hz</div>
+      </div>
+      <div class="profile-card">
+        <span class="profile-icon">🎹</span>
+        <div class="profile-name">Keys</div>
+        <div class="profile-range">500 - 8k Hz</div>
+      </div>
+      <div class="profile-card">
+        <span class="profile-icon">🎛</span>
+        <div class="profile-name">Synth</div>
+        <div class="profile-range">200 - 8k Hz</div>
+      </div>
+      <div class="profile-card">
+        <span class="profile-icon">🔊</span>
+        <div class="profile-name">Mix Bus</div>
+        <div class="profile-range">500 - 14k Hz</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPECS -->
+  <div class="specs-bar reveal">
+    <div class="spec-item">
+      <div class="spec-val">23ms</div>
+      <div class="spec-label">Latency</div>
+    </div>
+    <div class="spec-item">
+      <div class="spec-val">AU / VST3</div>
+      <div class="spec-label">Formats</div>
+    </div>
+    <div class="spec-item">
+      <div class="spec-val">macOS</div>
+      <div class="spec-label">Platform</div>
+    </div>
+    <div class="spec-item">
+      <div class="spec-val">1024</div>
+      <div class="spec-label">FFT Size</div>
+    </div>
+    <div class="spec-item">
+      <div class="spec-val">8</div>
+      <div class="spec-label">Auto Nodes</div>
+    </div>
+    <div class="spec-item">
+      <div class="spec-val">40</div>
+      <div class="spec-label">ERB Bands</div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <section class="cta-section reveal" id="get-it">
+    <div class="cta-badge">FREE WHILE IN BETA</div>
+    <h2 class="cta-heading">Get HarmoniQ free.</h2>
+    <p class="cta-sub">
+      Join the early access list. You'll get the beta plugin immediately, plus updates as we ship new versions. First name and email — that's it.
+    </p>
+
+    <div id="formContainer">
+      <div class="email-form" id="signupForm">
+        <input type="text" id="firstName" placeholder="First name" required autocomplete="given-name">
+        <input type="email" id="emailInput" placeholder="you@email.com" required autocomplete="email">
+        <button type="button" id="submitBtn" onclick="handleSubmit()">Get free access</button>
+      </div>
+      <p class="form-note">No spam. No selling your info. Just plugin updates and the occasional production tip.</p>
+    </div>
+
+    <div class="success-msg" id="successMsg">
+      <h3>You're in.</h3>
+      <p>Check your inbox for the download link. Welcome to the early crew.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-brand">MycoStudio</div>
+    <p>&copy; 2026 MycoStudio. HarmoniQ is in active development.</p>
+  </footer>
+
+</div>
+
+<script>
+// ── SPECTRUM ANIMATION ──
+const canvas = document.getElementById('spectrumCanvas');
+const ctx = canvas.getContext('2d');
+let frame = 0;
+
+function resizeCanvas() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 2;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  ctx.scale(dpr, dpr);
+}
+resizeCanvas();
+window.addEventListener('resize', () => {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  resizeCanvas();
+});
+
+function freqToX(freq, w, padL, padR) {
+  const logMin = Math.log10(20), logMax = Math.log10(20000);
+  return padL + ((Math.log10(freq) - logMin) / (logMax - logMin)) * (w - padL - padR);
+}
+function dbToY(db, h, padT, padB) {
+  return padT + ((-db) / 72) * (h - padT - padB);
+}
+
+function drawSpectrum() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  const padL = 32, padR = 24, padT = 10, padB = 16;
+
+  ctx.setTransform(window.devicePixelRatio || 2, 0, 0, window.devicePixelRatio || 2, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+
+  // Grid
+  ctx.strokeStyle = '#0c1828';
+  ctx.lineWidth = 0.5;
+  [50,100,200,500,1000,2000,5000,10000,20000].forEach(f => {
+    const x = freqToX(f, w, padL, padR);
+    ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, h - padB); ctx.stroke();
+  });
+  [-6,-12,-18,-24,-36,-48,-60].forEach(db => {
+    const y = dbToY(db, h, padT, padB);
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w - padR, y); ctx.stroke();
+  });
+
+  // 0dB line
+  ctx.strokeStyle = '#1a2a40'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(padL, dbToY(0, h, padT, padB)); ctx.lineTo(w - padR, dbToY(0, h, padT, padB)); ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = '#2a3a5a';
+  ctx.font = '8px JetBrains Mono, monospace';
+  ctx.textAlign = 'center';
+  ['50','100','200','500','1k','2k','5k','10k','20k'].forEach((l, i) => {
+    ctx.fillText(l, freqToX([50,100,200,500,1000,2000,5000,10000,20000][i], w, padL, padR), h - 3);
+  });
+
+  // Generate spectrum
+  const numBins = 256;
+  const input = [], output = [];
+  for (let i = 0; i < numBins; i++) {
+    const freq = 20 * Math.pow(1000, i / numBins);
+    const base = -6 + 20 * Math.log10(Math.max(0.001, freq / 200)) * -0.7 + 8 * Math.exp(-Math.pow(Math.log2(freq / 3000), 2) * 2);
+    const noise = Math.sin(i * 0.3 + frame * 0.04) * 2.2 + Math.sin(i * 0.7 + frame * 0.025) * 1.8;
+    const v = Math.max(-72, Math.min(-3, base + noise));
+    input.push(v);
+    const reduction = (freq > 800 && freq < 12000) ? Math.max(0, v + 18) * 0.09 : 0;
+    output.push(v - reduction);
+  }
+
+  // Intelligence fill
+  ctx.beginPath();
+  for (let i = 0; i < numBins; i++) {
+    const freq = 20 * Math.pow(1000, i / numBins);
+    const x = freqToX(freq, w, padL, padR);
+    if (i === 0) ctx.moveTo(x, dbToY(input[i], h, padT, padB));
+    else ctx.lineTo(x, dbToY(input[i], h, padT, padB));
+  }
+  for (let i = numBins - 1; i >= 0; i--) {
+    const freq = 20 * Math.pow(1000, i / numBins);
+    ctx.lineTo(freqToX(freq, w, padL, padR), dbToY(output[i], h, padT, padB));
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(64, 200, 176, 0.1)';
+  ctx.fill();
+
+  // Reduction curtains
+  const curtainNodes = [
+    { freq: 3200, gain: -4.5 + Math.sin(frame * 0.018) * 0.6, q: 2.8 },
+    { freq: 5800, gain: -2.8 + Math.sin(frame * 0.022 + 1) * 0.5, q: 3.2 },
+    { freq: 8200, gain: -1.8 + Math.sin(frame * 0.015 + 2) * 0.4, q: 2.2 },
+  ];
+  curtainNodes.forEach(node => {
+    const absGain = Math.abs(node.gain);
+    const maxDrop = (h - padT - padB) * 0.4;
+    const curtainDrop = (absGain / 12) * maxDrop;
+    const sigma = (1 / node.q) * 0.6;
+    const logCenter = Math.log2(node.freq);
+    const steps = 60;
+
+    ctx.beginPath();
+    for (let s = 0; s <= steps; s++) {
+      const t = (s / steps) * 2 - 1;
+      const octOff = t * 3 * sigma;
+      const f = Math.pow(2, logCenter + octOff);
+      const x = freqToX(f, w, padL, padR);
+      const gauss = Math.exp(-0.5 * (octOff / sigma) ** 2);
+      if (s === 0) ctx.moveTo(x, padT); else ctx.lineTo(x, padT + curtainDrop * gauss);
+    }
+    ctx.lineTo(freqToX(Math.pow(2, logCenter + 3 * sigma), w, padL, padR), padT);
+    ctx.closePath();
+
+    const grad = ctx.createLinearGradient(0, padT, 0, padT + curtainDrop);
+    grad.addColorStop(0, `rgba(232, 80, 80, ${0.04 + absGain * 0.02})`);
+    grad.addColorStop(0.5, `rgba(232, 80, 80, ${0.1 + absGain * 0.025})`);
+    grad.addColorStop(1, 'rgba(232, 80, 80, 0.01)');
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Edge
+    ctx.beginPath();
+    for (let s = 0; s <= steps; s++) {
+      const t = (s / steps) * 2 - 1;
+      const octOff = t * 3 * sigma;
+      const f = Math.pow(2, logCenter + octOff);
+      const x = freqToX(f, w, padL, padR);
+      const gauss = Math.exp(-0.5 * (octOff / sigma) ** 2);
+      if (s === 0) ctx.moveTo(x, padT + curtainDrop * gauss); else ctx.lineTo(x, padT + curtainDrop * gauss);
+    }
+    ctx.strokeStyle = `rgba(232, 80, 80, ${0.2 + absGain * 0.04})`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Tip diamond
+    const cx = freqToX(node.freq, w, padL, padR);
+    const ty = padT + curtainDrop;
+    ctx.beginPath();
+    ctx.moveTo(cx, ty - 3); ctx.lineTo(cx + 2.5, ty); ctx.lineTo(cx, ty + 3); ctx.lineTo(cx - 2.5, ty);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(232, 80, 80, ${0.45 + absGain * 0.04})`;
+    ctx.fill();
+  });
+
+  // Input spectrum
+  ctx.beginPath();
+  for (let i = 0; i < numBins; i++) {
+    const freq = 20 * Math.pow(1000, i / numBins);
+    const x = freqToX(freq, w, padL, padR);
+    if (i === 0) ctx.moveTo(x, dbToY(input[i], h, padT, padB));
+    else ctx.lineTo(x, dbToY(input[i], h, padT, padB));
+  }
+  ctx.strokeStyle = '#4a5a7a'; ctx.globalAlpha = 0.35; ctx.lineWidth = 1; ctx.stroke(); ctx.globalAlpha = 1;
+
+  // Output spectrum
+  ctx.beginPath();
+  for (let i = 0; i < numBins; i++) {
+    const freq = 20 * Math.pow(1000, i / numBins);
+    const x = freqToX(freq, w, padL, padR);
+    if (i === 0) ctx.moveTo(x, dbToY(output[i], h, padT, padB));
+    else ctx.lineTo(x, dbToY(output[i], h, padT, padB));
+  }
+  ctx.strokeStyle = '#5eecd0'; ctx.lineWidth = 1.2; ctx.stroke();
+
+  // Focus indicator (amber triangle + dashed line)
+  const focusX = freqToX(3500, w, padL, padR);
+  ctx.beginPath();
+  ctx.moveTo(focusX - 4, padT); ctx.lineTo(focusX + 4, padT); ctx.lineTo(focusX, padT + 6);
+  ctx.closePath();
+  ctx.fillStyle = '#d29922'; ctx.fill();
+  ctx.strokeStyle = 'rgba(210, 153, 34, 0.08)'; ctx.lineWidth = 0.8; ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(focusX, padT + 6); ctx.lineTo(focusX, h - padB); ctx.stroke();
+  ctx.setLineDash([]);
+
+  frame++;
+  requestAnimationFrame(drawSpectrum);
+}
+drawSpectrum();
+
+// ── SCROLL REVEAL ──
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.15 });
+reveals.forEach(el => observer.observe(el));
+
+// ── FORM HANDLER ──
+function handleSubmit() {
+  const name = document.getElementById('firstName').value.trim();
+  const email = document.getElementById('emailInput').value.trim();
+  const btn = document.getElementById('submitBtn');
+
+  if (!name || !email || !email.includes('@')) {
+    btn.textContent = 'Please fill in both fields';
+    btn.style.background = 'var(--coral)';
+    setTimeout(() => { btn.textContent = 'Get free access'; btn.style.background = ''; }, 2000);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Joining...';
+
+  // Simulate API call — replace with your actual endpoint
+  setTimeout(() => {
+    document.getElementById('formContainer').style.display = 'none';
+    document.getElementById('successMsg').classList.add('show');
+    console.log('Signup:', { name, email });
+  }, 1000);
+}
+
+// Enter key submits
+document.getElementById('emailInput').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') handleSubmit();
+});
+</script>
+
+</body>
+</html>
