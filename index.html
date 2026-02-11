@@ -986,8 +986,9 @@
     </div>
 
     <div class="success-msg" id="successMsg">
-      <h3>You're in.</h3>
-      <p>Check your inbox for the download link. Welcome to the early crew.</p>
+      <h3>You're in. Your download is starting...</h3>
+      <p>If it doesn't start automatically, <a href="/HarmoniQ-1.0-Beta-Installer.pkg" download style="color: var(--teal); text-decoration: underline;">click here to download</a>.</p>
+      <p style="margin-top: 10px; font-size: 12px; color: var(--text-muted);">macOS installer • 7.2 MB • Apple Silicon (arm64)</p>
     </div>
   </section>
 
@@ -1211,6 +1212,14 @@ function handleSubmit() {
     document.getElementById('formContainer').style.display = 'none';
     document.getElementById('successMsg').classList.add('show');
     console.log('Signup:', { name, email });
+
+    // Trigger PKG download
+    const link = document.createElement('a');
+    link.href = '/HarmoniQ-1.0-Beta-Installer.pkg';
+    link.download = 'HarmoniQ-1.0-Beta-Installer.pkg';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }, 1000);
 }
 
