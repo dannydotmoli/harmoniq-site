@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TonEase — Feedback</title>
+<meta name="description" content="Share your feedback on TonEase. Help us build the plugin you actually need.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #040810;
+    --bg-surface: #060a14;
+    --bg-card: #0a1020;
+    --bg-elevated: #0e1630;
+    --border: #152035;
+    --border-hover: #1e3050;
+    --text-primary: #e8ecf4;
+    --text-secondary: #8a9ab8;
+    --text-muted: #4a5a7a;
+    --teal: #40c8b0;
+    --teal-glow: #5eecd0;
+    --amber: #d29922;
+    --coral: #e85050;
+    --teal-bg: rgba(64, 200, 176, 0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  nav {
+    padding: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: 0.15em;
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+  .logo span { color: var(--teal); }
+  .nav-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+
+  .page-header {
+    padding: 60px 0 20px;
+    text-align: center;
+  }
+  .page-header h1 {
+    font-size: clamp(28px, 4vw, 38px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .page-header p {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .feedback-form {
+    padding: 40px 0 80px;
+  }
+
+  .form-group {
+    margin-bottom: 24px;
+  }
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+  }
+  .form-group .optional {
+    color: var(--text-muted);
+    font-weight: 300;
+    font-size: 12px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  .form-group input::placeholder,
+  .form-group textarea::placeholder {
+    color: var(--text-muted);
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(64, 200, 176, 0.08);
+  }
+  .form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5a7a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+  }
+  .form-group select option {
+    background: var(--bg-card);
+    color: var(--text-primary);
+  }
+  .form-group textarea {
+    resize: vertical;
+    min-height: 140px;
+    line-height: 1.6;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--teal);
+    color: var(--bg-deep);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.02em;
+  }
+  .submit-btn:hover {
+    background: var(--teal-glow);
+    box-shadow: 0 0 20px rgba(64, 200, 176, 0.2);
+    transform: translateY(-1px);
+  }
+  .submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .form-note {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+
+  .success-msg {
+    background: var(--teal-bg);
+    border: 1px solid rgba(64, 200, 176, 0.2);
+    border-radius: 8px;
+    padding: 28px 32px;
+    text-align: center;
+    display: none;
+  }
+  .success-msg.show { display: block; }
+  .success-msg h3 {
+    color: var(--teal);
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+  .success-msg p {
+    color: var(--text-secondary);
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 13px;
+    margin-top: 24px;
+    transition: color 0.2s ease;
+  }
+  .back-link:hover { color: var(--teal); }
+
+  footer {
+    padding: 28px 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  footer p {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  footer .footer-brand {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <nav>
+    <a href="/" class="logo">Ton<span>Ease</span></a>
+    <div class="nav-tag">MycoStudio LLC</div>
+  </nav>
+
+  <div class="page-header">
+    <h1>We want to hear from you.</h1>
+    <p>Your feedback directly shapes TonEase. Bug reports, feature ideas, workflow suggestions &mdash; everything helps us build the plugin you actually need.</p>
+  </div>
+
+  <section class="feedback-form">
+
+    <div id="formContainer">
+      <form id="feedbackForm" name="feedback" method="POST" action="/feedback-thanks" data-netlify="true" netlify-honeypot="bot-field">
+        <input type="hidden" name="form-name" value="feedback">
+        <input type="hidden" name="bot-field">
+
+        <div class="form-group">
+          <label>Email <span class="optional">(optional &mdash; include if you'd like us to follow up)</span></label>
+          <input type="email" name="email" placeholder="you@email.com" autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label>Category</label>
+          <select name="category" required>
+            <option value="">Select a category...</option>
+            <option value="bug">Bug Report</option>
+            <option value="feature">Feature Request</option>
+            <option value="workflow">Workflow / Usability</option>
+            <option value="sound-quality">Sound Quality</option>
+            <option value="general">General Feedback</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Your feedback</label>
+          <textarea name="message" required placeholder="Tell us what's on your mind. The more detail the better &mdash; what DAW are you using, what were you working on, what happened?"></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">Send feedback</button>
+      </form>
+
+      <p class="form-note">Your input goes directly to our development team. We read every single submission.</p>
+    </div>
+
+    <div class="success-msg" id="successMsg">
+      <h3>Thank you. We got it.</h3>
+      <p>Your feedback has been received and will be reviewed by the team. If you included your email, we may follow up with questions or updates.</p>
+      <a href="/" class="back-link">&larr; Back to TonEase</a>
+    </div>
+
+  </section>
+
+  <footer>
+    <div class="footer-brand">MycoStudio LLC</div>
+    <p>&copy; 2026 MycoStudio LLC. TonEase is in active development.</p>
+  </footer>
+
+</div>
+
+<script>
+const form = document.getElementById('feedbackForm');
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const btn = document.getElementById('submitBtn');
+  const message = form.querySelector('[name="message"]').value.trim();
+  const category = form.querySelector('[name="category"]').value;
+
+  if (!message || !category) {
+    btn.textContent = 'Please fill in the required fields';
+    btn.style.background = '#e85050';
+    setTimeout(() => { btn.textContent = 'Send feedback'; btn.style.background = ''; }, 2000);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  const formData = new FormData(form);
+  fetch('/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams(formData).toString()
+  })
+  .then(() => {
+    document.getElementById('formContainer').style.display = 'none';
+    document.getElementById('successMsg').classList.add('show');
+  })
+  .catch(() => {
+    btn.textContent = 'Something went wrong — try again';
+    btn.style.background = '#e85050';
+    setTimeout(() => { btn.textContent = 'Send feedback'; btn.style.background = ''; btn.disabled = false; }, 2500);
+  });
+});
+</script>
+
+</body>
+</html>
