@@ -1,0 +1,18 @@
+[build]
+  publish = "."
+
+[build.processing]
+  skip_processing = false
+
+# Redirect the form success page back to the main page
+[[redirects]]
+  from = "/success"
+  to = "/#get-it"
+  status = 302
+
+# Ensure the .pkg file is served correctly
+[[headers]]
+  for = "/*.pkg"
+  [headers.values]
+    Content-Type = "application/octet-stream"
+    Content-Disposition = "attachment"
